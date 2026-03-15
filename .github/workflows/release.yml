@@ -1,0 +1,74 @@
+name: Release Build
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  build:
+    name: Build for ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+          - windows-latest
+          - macos-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+
+      - name: Build release
+        uses: actions-rs/cargo@v1
+        with:
+          command: build
+          args: --release
+
+      - name: Get version from tag
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+        shell: bash
+
+      - name: Prepare release assets
+        id: prepare_assets
+        run: |
+          if [ "${{ matrix.os }}" = "windows-latest" ]; then
+            ASSET_NAME="forum-saver-${{ env.VERSION }}-windows-x86_64.exe"
+            cp target/release/forum-saver.exe "$ASSET_NAME"
+          elif [ "${{ matrix.os }}" = "ubuntu-latest" ]; then
+            ASSET_NAME="forum-saver-${{ env.VERSION }}-linux-x86_64"
+            cp target/release/forum-saver "$ASSET_NAME"
+          elif [ "${{ matrix.os }}" = "macos-latest" ]; then
+            ASSET_NAME="forum-saver-${{ env.VERSION }}-macos-x86_64"
+            cp target/release/forum-saver "$ASSET_NAME"
+          fi
+          echo "ASSET_NAME=$ASSET_NAME" >> $GITHUB_ENV
+        shell: bash
+
+      - name: Create release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+
+      - name: Upload release asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./${{ env.ASSET_NAME }}
+          asset_name: ${{ env.ASSET_NAME }}
+          asset_content_type: application/octet-stream

@@ -1,0 +1,161 @@
+# forum-saver 配置文件示例
+# 复制此文件为 config.toml 并根据需要修改
+
+# 下载内容的存储目录，默认为 ./data
+store_dir = "./data"
+
+# 允许的并发下载数，默认为 8
+semaphore_count = 8
+
+# 语言偏好，可选值: "zh" (中文) 或 "en" (英文)，默认自动检测
+# language = "zh"
+
+# 可下载资源的 HTML 属性，默认值已在代码中设置
+# 如需添加或修改，可取消注释并修改
+# downloadable_attrs = ["href", "src", "data-src", "file", "zoomfile", "poster", "style"]
+
+# 可下载资源的文件扩展名，默认值已在代码中设置
+# 如需添加或修改，可取消注释并修改
+# downloadable_extensions = ["png", "jpg", "jpeg", "gif", "svg", "webp", "tiff", "bmp", "js", "mjs", "css", "scss", "less", "woff", "woff2", "ttf", "eot", "otf", "mp4", "webm", "ogg", "mp3", "wav", "aac", "flac"]
+
+# 文件路径最大长度，默认为 240
+# max_path_length = 240
+
+# 生成的资源文件名的哈希长度，默认为 16
+# path_hash_length = 16
+
+# 资源发现的最大递归深度，默认为 3
+# max_depth = 3
+
+
+# 论坛配置列表，每个论坛配置项对应一个[[forums]]
+[[forums]]
+# Discuz 论坛通用配置
+[forums.Discuz]
+# 论坛名称，决定下载的资源存储目录
+name = "S1"
+# 论坛基础 URL
+base_url = "https://stage1st.com/2b/"
+# 认证方式，默认为 "Guest"
+# - Guest: 游客模式
+# - CookieFromBrowser: 从浏览器获取 Cookie，支持 "Chrome", "Firefox", "Edge", "Opera", "Safari"
+# - CookieString: 直接提供 Cookie 字符串，格式: { CookieString = "your_cookie_string" }
+# - UsernamePassword: 用户名密码登录，格式: { UsernamePassword = { username = "your_username", password = "your_password" } }
+# !注意：Windows系统下无法读取Chrome浏览器的Cookie，建议使用Firefox，或直接用CookieString登录
+# auth_method = { CookieFromBrowser = "Firefox" }
+auth_method = "Guest"
+# 是否移除广告，默认为 true
+# remove_ads = true
+# 是否移除登录用户信息，默认为 true
+# remove_user_info = true
+# 是否移除回帖框，默认为 true
+# remove_reply_box = true
+# 页面下载间隔，单位毫秒，默认为 1500
+# interval_ms = 1500
+# 帖子 URL 模板，默认为 "thread-{tid}-{pn}-1.html"
+# thread_url_template = "thread-{tid}-{pn}-1.html"
+
+# Discuz 论坛选择器配置，默认配置适用于S1，其余Discuz论坛可能需要进行修改
+[forums.Discuz.selectors]
+# 帖子标题选择器
+# thread_title = "h1"
+# 分页 div 选择器
+# pg_divs = "div.pg"
+# 分页按钮选择器
+# pgbtn = "div.pgbtn"
+# 页码输入框选择器
+# pn_input = "input.px[name='custompage']"
+# 用户名选择器
+# username = "strong.vwmy"
+# 用户信息选择器
+# user_info = "#um"
+# 登录框选择器
+# login_box = "div.y.pns"
+# 回复框选择器
+# reply_box = "#f_pst"
+# 广告选择器
+# ads = ".wp.a_h"
+# 字符集选择器
+# charset = "meta[charset='gbk']"
+
+[[forums]]
+[forums.Discuz]
+# Chiphell与S1配置一致，仅需修改name与base_url
+name = "Chiphell"
+base_url = "https://www.chiphell.com"
+
+[[forums]]
+[forums.Discuz]
+name = "tgfc"
+base_url = "https://tgfcer.com"
+# tgfc 论坛选择器配置
+[forums.Discuz.selectors]
+pg_divs = "div.pages"
+ads = "div[class^='ad_']"
+charset = "meta[http-equiv='Content-Type']"
+
+[[forums]]
+[forums.Discuz]
+name = "77bike"
+base_url = "http://bbs.77bike.com"
+# 77bike 帖子网址模板
+thread_url_template = "read.php?tid={tid}&page={pn}"
+# 77bike 论坛选择器配置
+[forums.Discuz.selectors]
+pg_divs = "div.pages"
+login_box = "div.header_login.fr"
+
+[[forums]]
+[forums.Discuz]
+name = "临高启明"
+base_url = "https://lgqmonline.top"
+auth_method = "Guest"
+
+[[forums]]
+# V2ex 论坛配置
+[forums.V2ex]
+# 论坛名称
+name = "V2ex"
+# 论坛基础 URL
+base_url = "https://v2ex.com"
+# 认证方式
+auth_method = "Guest"
+# remove_ads = true
+# remove_user_info = true
+# remove_reply_box = true
+# interval_ms = 1500
+
+
+[[forums]]
+# NGA 论坛配置
+[forums.NGA]
+# 论坛名称
+name = "NGA"
+# 论坛基础 URL
+# !注意：bbs.nga.cn域名不支持从浏览器获取Cookie，建议使用nga.178.com
+base_url = "https://nga.178.com"
+# 认证方式（NGA 不支持游客模式和用户名密码登录）
+auth_method = { CookieFromBrowser = "Firefox" }
+# remove_ads = true
+# remove_user_info = true
+# remove_reply_box = true
+# interval_ms = 1500
+
+
+# 配置说明：
+# 1. 认证方式获取方法：
+#    - CookieFromBrowser: 会自动从指定浏览器中获取对应网站的 Cookie
+#    - CookieString: 在浏览器中按 F12 打开开发者工具，进入网络(Network)标签，刷新页面，选择任意请求，在请求头(Request Headers)中找到 Cookie 字段，复制其值
+#    - UsernamePassword: 直接填写论坛账号和密码（部分论坛可能需要验证码，不推荐使用）
+
+# 2. Discuz 选择器配置：
+#    - 当默认选择器无法正确识别页面元素时，可以通过浏览器开发者工具获取对应元素的 CSS 选择器
+#    - 方法：在浏览器中按 F12 打开开发者工具，选择元素选择器工具，点击需要选择的元素，在开发者工具右侧查看其 CSS 选择器
+
+# 3. 页面下载间隔：
+#    - 为避免触发论坛的访问限制，建议设置合理的下载间隔
+#    - 设置为 0 时会异步下载所有页面，速度快但容易触发封禁
+
+# 4. 存储目录：
+#    - 下载的帖子会保存在 store_dir/论坛名称/ 目录下
+#    - 帖子内容保存在 posts 子目录，资源文件保存在 assets 子目录
