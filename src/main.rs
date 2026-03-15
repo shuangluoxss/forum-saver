@@ -3,7 +3,7 @@ use forum_saver::cli::Cli;
 use forum_saver::core::{Downloader, DownloaderConfig};
 use forum_saver::i18n::I18n;
 use log::{error, info};
-use std::{fs, io::Write, path::Path};
+use std::{fs, io::Write};
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
@@ -121,8 +121,7 @@ async fn main() -> anyhow::Result<()> {
                 });
 
                 // 读取 config_sample.toml 文件内容
-                let sample_config_path = Path::new("./resources/config_sample.toml");
-                let sample_content = fs::read_to_string(sample_config_path)?;
+                let sample_config_content = include_bytes!("../resources/config_sample.toml");
                 if output_path.exists() {
                     error!(
                         "{}",
@@ -132,7 +131,7 @@ async fn main() -> anyhow::Result<()> {
                         )
                     );
                 } else {
-                    fs::write(&output_path, sample_content)?;
+                    fs::write(&output_path, sample_config_content)?;
                     info!(
                         "{}",
                         i18n.t(
