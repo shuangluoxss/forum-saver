@@ -134,7 +134,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: ./artifacts
-          pattern: forum-saver-*
+          pattern: forum-saver_*
           merge-multiple: true
 
       - name: Upload CLI assets to Release
