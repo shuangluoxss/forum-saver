@@ -1,5 +1,8 @@
-/target
+**/target
 **/.DS_Store
-*.html
 /data
 /.trae
+**/node_modules
+**/.vscode
+**/dist
+**/dist-ssr
