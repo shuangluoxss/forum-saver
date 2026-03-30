@@ -1,8 +1,10 @@
 # Log messages
+downloading-thread = 正在下载帖子: "{$url}"
 thread-url = 帖子链接: "{$url}"
 username = 论坛: {$forum}，用户名: {$username}
 not-login = 论坛: {$forum}，未登录
 started-downloading = 开始下载帖子: "{$title}", 共 {$pages} 页
+resume-from-page = 检测到本地已有页码，从第 {$page} 页开始下载...
 error-fetching-page = 获取第 {$page} 页失败: {$error}
 thread-complete = 帖子下载完成。保存到: "{$path}"
 download-failed = 下载帖子失败: {$error}

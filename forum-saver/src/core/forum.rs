@@ -26,6 +26,8 @@ pub trait ForumProvider: Send + Sync {
     fn generate_thread_url(&self, tid: &str, pn: &str) -> String;
     /// 帖子链接转为本地文件名
     fn generate_filename(&self, tid: &str, pn: &str) -> String;
+    /// 从本地文件名中提取页码
+    fn extract_pn_from_filename(&self, filename: &str, tid: &str) -> Option<usize>;
     /// 获取帖子信息
     fn extract_thread_info(&self, thread_url: &str, document: &NodeRef) -> Result<ThreadInfo>;
     /// 根据登陆设置生成客户端

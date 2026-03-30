@@ -26,6 +26,14 @@ use tokio::{
 };
 use url::Url;
 
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+#[serde(rename_all = "kebab-case")]
+pub enum DownloadStrategy {
+    FromStart,
+    #[default]
+    ResumeLatest,
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(default)]
 pub struct DownloaderConfig {
@@ -47,6 +55,8 @@ pub struct DownloaderConfig {
     pub semaphore_count: usize,
     /// Language preference ("en" or "zh"), None means auto-detect from system
     pub language: Option<String>,
+    /// Download strategy
+    pub strategy: DownloadStrategy,
 }
 
 impl Default for DownloaderConfig {
@@ -58,6 +68,7 @@ impl Default for DownloaderConfig {
             path_hash_length: 16,
             max_depth: 3,
             semaphore_count: 8,
+            strategy: DownloadStrategy::default(),
             downloadable_attrs: HashSet::from_iter(
                 [
                     "href", "src", "data-src", "file", "zoomfile", "poster", "style",
@@ -241,6 +252,26 @@ impl Downloader {
         pb_spinner.set_style(ProgressStyle::with_template("{spinner:.green} {msg}").unwrap());
         pb_spinner.enable_steady_tick(Duration::from_millis(100));
 
+        // 检查本地已有的页码
+        let mut start_pn = 1;
+        if matches!(self.config.strategy, DownloadStrategy::ResumeLatest) {
+            if let Ok(mut entries) = tokio::fs::read_dir(&html_dir).await {
+                while let Some(entry) = entries.next_entry().await.ok().flatten() {
+                    let filename = entry.file_name().to_string_lossy().to_string();
+                    if let Some(pn) = forum.extract_pn_from_filename(&filename, &thread_id) {
+                        start_pn = start_pn.max(pn);
+                    }
+                }
+            }
+            if start_pn > 1 {
+                let message = self.i18n.t("resume-from-page", Some(&[("page", &start_pn.to_string())]));
+                info!("{message}");
+                if let Some(ref sender) = channel {
+                    let _ = sender.send(DownloadInfo::new_info(message)).await;
+                }
+            }
+        }
+
         // 发送初始化消息
         let init_msg = self.i18n.t("initializing", None);
         pb_spinner.set_message(init_msg.clone());
@@ -248,7 +279,13 @@ impl Downloader {
             let _ = sender.send(DownloadInfo::new_info(init_msg)).await;
         }
 
-        let pb_process = mp.add(ProgressBar::new(thread_info.total_pages as u64));
+        let total_download_pages = if start_pn > 1 {
+            thread_info.total_pages.saturating_sub(start_pn) + 2 // page 1 + [start_pn..total_pages]
+        } else {
+            thread_info.total_pages
+        };
+
+        let pb_process = mp.add(ProgressBar::new(total_download_pages as u64));
         pb_process.set_style(
             ProgressStyle::with_template("{wide_bar:.cyan/blue} {pos:>3}/{len:3} {msg}").unwrap(),
         );
@@ -263,7 +300,7 @@ impl Downloader {
             mp: Some(mp.clone()),
             channel: channel.clone(),
         };
-        let fetch_tasks: Vec<_> = (2..=thread_info.total_pages)
+        let fetch_tasks: Vec<_> = (start_pn.max(2)..=thread_info.total_pages)
             .map(|pn| {
                 let thread_id = thread_id.clone();
                 let html_url = forum.generate_thread_url(&thread_id, &pn.to_string());
@@ -351,8 +388,9 @@ impl Downloader {
         if interval_ms > 0 {
             let duration = Duration::from_millis(interval_ms);
             let total_pages = thread_info.total_pages;
+            let start_pn_loop = start_pn.max(2);
             for (i, task) in fetch_tasks.into_iter().enumerate() {
-                let current_pn = i + 2;
+                let current_pn = i + start_pn_loop;
                 let page_saved_msg = self.i18n.t(
                     "page-saved",
                     Some(&[

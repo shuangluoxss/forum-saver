@@ -226,6 +226,17 @@ export const GLOBAL_SCHEMA: FormSchema = {
           span: 8,
           defaultValue: 8,
         },
+        {
+          key: "strategy",
+          label: "下载策略",
+          type: "select",
+          span: 24,
+          defaultValue: "resume-latest",
+          options: [
+            { label: "从最新页继续 (resume-latest)", value: "resume-latest" },
+            { label: "从第一页开始 (from-start)", value: "from-start" },
+          ],
+        },
       ],
     },
     {

@@ -162,6 +162,16 @@ impl ForumProvider for V2exForum {
     fn generate_filename(&self, tid: &str, pn: &str) -> String {
         format!("t-{tid}-{pn}.html")
     }
+    fn extract_pn_from_filename(&self, filename: &str, tid: &str) -> Option<usize> {
+        let prefix = format!("t-{tid}-");
+        let suffix = ".html";
+        if filename.starts_with(&prefix) && filename.ends_with(suffix) {
+            let pn_str = &filename[prefix.len()..filename.len() - suffix.len()];
+            pn_str.parse::<usize>().ok()
+        } else {
+            None
+        }
+    }
 
     fn extract_thread_info(&self, thread_url: &str, document: &NodeRef) -> Result<ThreadInfo> {
         let (thread_id, _) = self.extract_tid_pn(&thread_url)?;

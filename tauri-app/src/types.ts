@@ -8,7 +8,10 @@ export interface DownloaderConfig {
   store_dir: string;
   semaphore_count: number;
   language?: string;
+  strategy?: DownloadStrategy;
 }
+
+export type DownloadStrategy = 'from-start' | 'resume-latest';
 
 export type ForumConfig = 
   | { Discuz: DiscuzForumConfig }

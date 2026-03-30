@@ -1,8 +1,10 @@
 # Log messages
+downloading-thread = Downloading thread: "{$url}"
 thread-url = Thread URL: "{$url}"
 username = Forum: {$forum}, Username: {$username}
 not-login = Forum: {$forum}, Not login
 started-downloading = Started downloading thread: "{$title}", {$pages} pages in total
+resume-from-page = Found local pages, resuming from page {$page}...
 error-fetching-page = Error fetching page {$page}: {$error}
 thread-complete = Thread download complete. Saved to: "{$path}"
 download-failed = Download thread failed: {$error}

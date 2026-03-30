@@ -168,6 +168,16 @@ impl ForumProvider for NGAForum {
     fn generate_filename(&self, tid: &str, pn: &str) -> String {
         format!("tid={tid}&page={pn}.html")
     }
+    fn extract_pn_from_filename(&self, filename: &str, tid: &str) -> Option<usize> {
+        let prefix = format!("tid={tid}&page=");
+        let suffix = ".html";
+        if filename.starts_with(&prefix) && filename.ends_with(suffix) {
+            let pn_str = &filename[prefix.len()..filename.len() - suffix.len()];
+            pn_str.parse::<usize>().ok()
+        } else {
+            None
+        }
+    }
     fn extract_thread_info(&self, thread_url: &str, document: &NodeRef) -> Result<ThreadInfo> {
         let (thread_id, pn) = self.extract_tid_pn(thread_url)?;
         let (_, total_pages, _, ps) =

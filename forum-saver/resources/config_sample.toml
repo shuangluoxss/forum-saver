@@ -7,6 +7,9 @@ store_dir = "./data"
 # 允许的并发下载数，默认为 8
 semaphore_count = 8
 
+# 下载策略，可选值: "resume-latest" (从最新页续传) 或 "from-start" (从头开始)，默认为 "resume-latest"
+strategy = "resume-latest"
+
 # 语言偏好，可选值: "zh" (中文) 或 "en" (英文)，默认自动检测
 # language = "zh"
 

@@ -131,7 +131,8 @@ const config = ref<DownloaderConfig>({
   max_depth: 3,
   store_dir: "./data",
   semaphore_count: 8,
-  language: "auto",
+  language: "zh",
+  strategy: "resume-latest",
 });
 
 const loadConfig = async () => {
